@@ -2,6 +2,13 @@
 
 WindSight is a full-stack web application that helps UK energy procurement teams evaluate wind power forecasts before day-ahead electricity purchasing decisions. It combines wind generation forecasts with actual generation data from Elexon and calculates quantitative forecast accuracy metrics.
 
+## Live Demo
+
+- **Frontend:** [https://windsight-frontend.onrender.com/](https://windsight-frontend.onrender.com/)
+- **Backend API:** [https://windsight-backend-1bbn.onrender.com](https://windsight-backend-1bbn.onrender.com)
+- **Interactive API Documentation:** [https://windsight-backend-1bbn.onrender.com/docs](https://windsight-backend-1bbn.onrender.com/docs)
+- **Health Check:** [https://windsight-backend-1bbn.onrender.com/api/health](https://windsight-backend-1bbn.onrender.com/api/health)
+
 ## Overview
 
 Wind generation depends on weather conditions, making it difficult to predict how much renewable electricity will be available on a given day. Energy procurement teams need to understand both the forecast available at decision time and how accurate that forecast is compared with actual generation.
@@ -16,7 +23,7 @@ The application focuses on UK national-level wind generation data for January 20
 ## Features
 
 - **Historical analysis:** Analyse a selected delivery date within January 2026.
-- **Decision-time forecasts:** Select a decision cutoff and use only forecasts published on or before that cutoff.
+- **Decision-time forecasts:** Use only forecasts published on or before the selected decision cutoff.
 - **Actual generation comparison:** Compare forecast generation against observed wind generation.
 - **Forecast accuracy metrics:** Calculate MAE, RMSE, bias and maximum absolute error.
 - **Time-series visualisation:** View forecast and actual generation over the delivery day.
@@ -35,37 +42,38 @@ The application focuses on UK national-level wind generation data for January 20
 | Testing | Pytest |
 | Containerisation | Docker |
 | Data source | Elexon BMRS API |
+| Deployment | Render |
 
 ## Data Sources
 
-WindSight uses the following Elexon datasets:
+WindSight uses the following Elexon datasets.
 
-### 1. Actual wind generation — FUELHH
+### 1. Actual Wind Generation — FUELHH
 
-Documentation: https://bmrs.elexon.co.uk/api-documentation/endpoint/datasets/FUELHH/stream
+Documentation: [Elexon FUELHH API](https://bmrs.elexon.co.uk/api-documentation/endpoint/datasets/FUELHH/stream)
 
 The application filters records to `fuelType = "WIND"` and uses:
 
-- `startTime`: delivery interval timestamp.
-- `generation`: actual wind generation.
+- `startTime`: Delivery interval timestamp.
+- `generation`: Actual wind generation.
 
 FUELHH actual generation is represented at half-hourly resolution.
 
-### 2. Wind generation forecasts — WINDFOR
+### 2. Wind Generation Forecasts — WINDFOR
 
-Documentation: https://bmrs.elexon.co.uk/api-documentation/endpoint/datasets/WINDFOR/stream
+Documentation: [Elexon WINDFOR API](https://bmrs.elexon.co.uk/api-documentation/endpoint/datasets/WINDFOR/stream)
 
 The application uses:
 
-- `startTime`: target delivery interval.
-- `publishTime`: time the forecast was published.
-- `generation`: forecast wind generation.
+- `startTime`: Target delivery interval.
+- `publishTime`: Time the forecast was published.
+- `generation`: Forecast wind generation.
 
 Forecast publication timestamps are essential because a purchasing decision can only use information available at the time the decision is made.
 
 ## Forecast Selection and Accuracy Methodology
 
-### Decision-time forecast selection
+### Decision-Time Forecast Selection
 
 For a selected delivery date and decision cutoff, WindSight:
 
@@ -77,7 +85,7 @@ For a selected delivery date and decision cutoff, WindSight:
 
 Forecasts published after the decision cutoff are excluded to avoid using information that was unavailable when the purchasing decision had to be made.
 
-### Accuracy metrics
+### Accuracy Metrics
 
 Let \(F_i\) represent forecast generation and \(A_i\) represent actual generation for a matched interval. Define the error as \(e_i = F_i - A_i\).
 
@@ -97,7 +105,7 @@ RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(F_i-A_i)^2}
 
 Penalises larger errors more heavily than MAE.
 
-**Forecast bias**
+**Forecast Bias**
 
 \[
 Bias = \frac{1}{n}\sum_{i=1}^{n}(F_i-A_i)
@@ -105,7 +113,7 @@ Bias = \frac{1}{n}\sum_{i=1}^{n}(F_i-A_i)
 
 A positive bias indicates over-forecasting on average; a negative bias indicates under-forecasting.
 
-**Maximum absolute error**
+**Maximum Absolute Error**
 
 \[
 MaxError = \max_i |F_i-A_i|
@@ -115,7 +123,7 @@ Shows the largest absolute forecast error among matched intervals.
 
 Metrics are calculated only for intervals with both forecast and actual values. If there are no matched intervals, the metrics are returned as unavailable rather than reporting misleading values.
 
-### Time-resolution limitation
+### Time-Resolution Limitation
 
 FUELHH actuals are half-hourly, while the WINDFOR response used by this application provides hourly forecasts. WindSight does not interpolate hourly forecasts or duplicate them into half-hourly intervals.
 
@@ -155,9 +163,9 @@ WindSight/
     └── package.json
 ```
 
-*The tree above reflects the expected project layout. Adjust the frontend folder and file names if your repository differs.*
+*The tree above reflects the expected project layout. Adjust folder and file names if your repository differs.*
 
-### Backend responsibilities
+### Backend Responsibilities
 
 - `main.py`: FastAPI application and API endpoints.
 - `schemas.py`: Request and response data models.
@@ -167,7 +175,7 @@ WindSight/
 - `tests/`: Tests for forecast selection and analytical calculations.
 - `Dockerfile`: Defines the containerised backend environment.
 
-### Frontend responsibilities
+### Frontend Responsibilities
 
 - `App.tsx`: Main application interface and analysis workflow.
 - `api/analysis.ts`: Sends requests to the backend.
@@ -187,7 +195,7 @@ Install the following:
 - Docker Desktop.
 - Git.
 
-### 1. Run the backend locally
+### 1. Run the Backend Locally
 
 Open PowerShell in the backend directory:
 
@@ -204,12 +212,12 @@ uvicorn app.main:app --reload
 
 The API should be available at:
 
-- API base URL: http://127.0.0.1:8000
-- Interactive API documentation: http://127.0.0.1:8000/docs
+- **API base URL:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **Interactive API documentation:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 Keep this terminal open while using the application.
 
-### 2. Run the frontend locally
+### 2. Run the Frontend Locally
 
 Open a second terminal:
 
@@ -223,7 +231,7 @@ Open the local URL printed by the frontend development server.
 
 Configure the frontend API base URL to point to the running backend. If the frontend and backend use different origins, configure FastAPI CORS to allow the frontend's origin.
 
-### 3. Run the backend with Docker
+### 3. Run the Backend with Docker
 
 Ensure Docker Desktop is running, then execute:
 
@@ -234,7 +242,7 @@ docker build -t windsight-backend .
 docker run --name windsight-api -p 8000:8000 windsight-backend
 ```
 
-Access the API documentation at http://localhost:8000/docs.
+Access the API documentation at [http://localhost:8000/docs](http://localhost:8000/docs).
 
 To stop and remove the container:
 
@@ -251,7 +259,7 @@ docker build -t windsight-backend .
 
 The Docker image runs the FastAPI application using Uvicorn on port 8000.
 
-### 4. Run tests
+### 4. Run Tests
 
 From the backend directory, activate the virtual environment if needed and run:
 
@@ -263,15 +271,16 @@ The current test suite contains four tests covering forecast selection at a deci
 
 ## Deployment
 
-**Live application:** [Add your deployed frontend URL]
+WindSight is deployed on Render.
 
-**Backend API:** [Add your deployed backend URL]
+| Component | URL |
+|---|---|
+| Live frontend | [https://windsight-frontend.onrender.com/](https://windsight-frontend.onrender.com/) |
+| Backend API | [https://windsight-backend-1bbn.onrender.com](https://windsight-backend-1bbn.onrender.com) |
+| API documentation | [https://windsight-backend-1bbn.onrender.com/docs](https://windsight-backend-1bbn.onrender.com/docs) |
+| Health check | [https://windsight-backend-1bbn.onrender.com/api/health](https://windsight-backend-1bbn.onrender.com/api/health) |
 
-**Interactive API documentation:** [Add your deployed backend URL followed by `/docs`]
-
-The frontend and backend must be configured to communicate using the deployed backend URL. Configure CORS for the deployed frontend origin and ensure the frontend's API base URL is correct.
-
-The backend can be deployed using a Docker-compatible hosting service. The frontend can be deployed to Vercel or another static/frontend hosting platform.
+The frontend communicates with the deployed backend API. The backend is configured to allow requests from the deployed frontend origin through CORS.
 
 ## Assumptions and Limitations
 
@@ -283,6 +292,7 @@ The backend can be deployed using a Docker-compatible hosting service. The front
 - Hourly forecasts are not artificially expanded to half-hourly intervals.
 - This is a decision-support prototype, not an automated electricity trading system.
 - Results depend on the availability and completeness of the upstream Elexon API.
+- The hosted services may take time to respond after periods of inactivity, depending on the hosting plan.
 
 ## AI Tool Disclosure
 
